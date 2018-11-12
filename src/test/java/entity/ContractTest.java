@@ -44,10 +44,6 @@ public class ContractTest {
 
     }
 
-    @Test
-    public void searchById() {
-        assertEquals(first,contract.searchById(13478987));
-
-    }
    
+
 }
