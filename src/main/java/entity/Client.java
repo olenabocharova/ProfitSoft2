@@ -30,7 +30,7 @@ public class Client {
         this.address = address;
     }
 
-    //конструкторы
+
 
 
     public Client(ClientType clientType, String name, String address) {
@@ -39,13 +39,13 @@ public class Client {
         this.address = address;
     }
 
-    //toString
+
 
     @Override
     public String toString() {
-        return "Сведения о клиете: " + System.lineSeparator()+
-                "Тип клиента: " + clientType.getOutput() +System.lineSeparator()+
-                "Имя клиента: " + name +   System.lineSeparator()+
-                "Адрес клиента: " + address ;
+        return "About client: " + System.lineSeparator()+
+                "Type of client: " + clientType.getOutput() +System.lineSeparator()+
+                "Client's name: " + name +   System.lineSeparator()+
+                "Client's address: " + address ;
     }
 }

@@ -57,10 +57,10 @@ public class InsuredPerson {
     @Override
     public String toString() {
         return
-                "ИНН: "+insuredId+System.lineSeparator()+
-                "Имя: " + name  + System.lineSeparator()+
-                        "Дата рождения: " + dateOfBirth + System.lineSeparator()+
-                        "Стоимость страховки: " + InsuranceCost +"грн." + System.lineSeparator();
+                "Id: "+insuredId+System.lineSeparator()+
+                "Name: " + name  + System.lineSeparator()+
+                        "Date Of birth: " + dateOfBirth + System.lineSeparator()+
+                        "Insurance cost: " + InsuranceCost +"y.e" + System.lineSeparator();
     }
 
     //*Parse name*/

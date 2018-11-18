@@ -1,6 +1,8 @@
 package entity;
+import java.io.*;
 import java.time.LocalDate;
 import java.time.Month;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class Contract {
@@ -79,16 +81,16 @@ public class Contract {
 
     @Override
     public String toString() {
-        return  "Договор: " +System.lineSeparator()+
-                "Номер договора: " + id +System.lineSeparator()+
-                "Дата заключения договора: " + conclusionDate + System.lineSeparator()+
-                "Дата начала действия договора: " + startDate + System.lineSeparator()+
-                "Дата окончания действия договора: " + endDate + System.lineSeparator()+
+        return  "Contract: " +System.lineSeparator()+
+                "Contract's number: " + id +System.lineSeparator()+
+                "Conclusion date: " + conclusionDate + System.lineSeparator()+
+                "Start date: " + startDate + System.lineSeparator()+
+                "End date: " + endDate + System.lineSeparator()+
                 client +System.lineSeparator()+
-                "Сведения о застрахованных лицах: "  +System.lineSeparator()+ (insuredPeople == null ? null : Arrays.asList(insuredPeople))+System.lineSeparator();
+                "Insured people: "  +System.lineSeparator()+ (insuredPeople == null ? null : Arrays.asList(insuredPeople))+System.lineSeparator();
     }
 
-    //конструкторы
+
     public Contract(int id, LocalDate conclusionDate, LocalDate startDate, LocalDate endDate, Client client, ArrayList<InsuredPerson> insuredPeople) {
         this.id = id;
         this.conclusionDate = conclusionDate;
@@ -99,7 +101,7 @@ public class Contract {
 
     }
 
-    //общая стоимость страховки по договору
+    //* total cost the total cost of insurance under the contract */
     public double totalInsuranceCost(){
         double cost=0;
         for(InsuredPerson i: insuredPeople){
@@ -120,15 +122,15 @@ public class Contract {
 //    }
 
     //*Sort by name */
-//    public ArrayList <InsuredPerson> sortByName(){
-//        for (InsuredPerson i:insuredPeople) {
-//            System.out.println("sort:"+i.getName());
-//
-//        }
-//        return insuredPeople;
-//    }
+    public ArrayList <InsuredPerson> sortByName(){
+        for (InsuredPerson i:insuredPeople) {
+            System.out.println("sort:"+i.getName());
 
-// search by id
+        }
+        return insuredPeople;
+    }
+
+//* search by id*/
     public  InsuredPerson searchById (int id){
         for(InsuredPerson i:insuredPeople){
             if(i.getInsuredId()==id)
@@ -137,15 +139,63 @@ public class Contract {
         return null;
     }
 
-    public static void main(String[] args) {
+//*read information from file and put values into
+// necessary entities*/
+    public static   List<Contract> readFromFile(String filename)  {
+        List<Contract> contracts = new ArrayList<>();
+
+        InputStreamReader inputStreamReader = null;
+        try {
+            inputStreamReader = new InputStreamReader(new FileInputStream(new File(filename)),"cp1251");
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+         BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+        String [] lines = null;
+        String line = null;
+        try{
+        while ((line = bufferedReader.readLine()) != null) {
+
+            lines= line.split(",");
+
+
+            LocalDate conc = LocalDate.parse(lines[1], DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+            LocalDate start = LocalDate.parse(lines[2], DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+            LocalDate end = LocalDate.parse(lines[3], DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+
+            Client client=new Client(ClientType.valueOf(lines[4]),lines[5],lines[6]);
+
+            ArrayList<InsuredPerson>insuredPeople=new ArrayList<>();
+            for(int i=7; i<lines.length; i+=4 ){
+                LocalDate d=LocalDate.parse(lines[i+2],DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+                InsuredPerson person = new InsuredPerson(Integer.valueOf(lines[i]),lines[i+1],d,Double.valueOf(lines[i+3]));
+                insuredPeople.add(person);
+
+
+            }
+            Contract contract=new Contract(Integer.valueOf(lines[0]),conc,start,end,client,insuredPeople);
+           contracts.add(contract);
+        }
+        bufferedReader.close();}
+        catch (IOException e){
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+        }
+        return contracts;
+
+    }
+    public static void main(String[] args) throws IOException {
         LocalDate conc=LocalDate.of(2002,Month.APRIL,2);
         LocalDate start=LocalDate.of(2002,Month.APRIL,3);
         LocalDate end=LocalDate.of(2007,Month.APRIL,10);
-        Client client= new Client(ClientType.NATURAL_PERSON,"Ivan Ivanov","Nebakulina 20");
-        InsuredPerson first = new InsuredPerson(13478987,"Иванов Николай Иванович",conc,1000);
-        InsuredPerson second = new InsuredPerson(25669807,"Иванова Ольга Ивановна",start,2000);
+        Client client= new Client(ClientType.NATURAL_PERSON,"Vaculenko Nikolay Ivanovich","Nebakulina 20");
+        InsuredPerson first = new InsuredPerson(13478987,"Vaculenko Stepan Nikolaevich",conc,1000);
+        InsuredPerson second = new InsuredPerson(25669807,"Vaculenko Alina Nikolaevna",start,2000);
 
-        //ArrayList<InsuredPerson> insuredPeople={first,second};
+
         ArrayList<InsuredPerson>insuredPeople=new ArrayList<InsuredPerson>();
 
         insuredPeople.add(first);
@@ -153,15 +203,15 @@ public class Contract {
         for (InsuredPerson a:insuredPeople){
             System.out.println(a.getName());
         }
-        //Name and date comporator
+        //*Name and date comporator*/
         insuredPeople.sort(nameComp);
-        System.out.println("Имена, отсортированные по алфавиту: ");
+        System.out.println("Names, sorted by ABC: ");
         for (InsuredPerson a:insuredPeople){
             System.out.println(a.getName());
         }
 
 insuredPeople.sort(dateComp);
-        System.out.println("Сортировка по дате рождения: ");
+        System.out.println("Sorted by date of birth: ");
         for (InsuredPerson a:insuredPeople){
             System.out.println(a.getDateOfBirth());
         }
@@ -169,18 +219,27 @@ insuredPeople.sort(dateComp);
         Contract contract= new Contract(1,conc,start,end,client,insuredPeople);
 
         System.out.println(contract);
-        System.out.println("Общая стоимость страховки по договору: "+contract.totalInsuranceCost()+"грн.");
+        System.out.println("Total insurance cost under the contract: "+contract.totalInsuranceCost()+"y.e");
 
-        System.out.println("Поиск по ИНН: "+ contract.searchById(13478987));
+        System.out.println("Search by id: "+ contract.searchById(13478987));
 
 
 
-        System.out.println("Вывод имени в виде: Фамилия И.О.: ");
+        System.out.println("Print name as: Familiya I.О.: ");
         for (InsuredPerson i:insuredPeople)
               {
                   i.printParseName();
 
         }
+
+        System.out.println();
+        System.out.println("Read from file: ");
+
+        for(Contract c:readFromFile("Contracts.csv")){
+            System.out.println(c);
+        }
+
+
 
 
 
